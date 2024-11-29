@@ -20,6 +20,6 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=8, decimal_places=2)
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_item")
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.IntegerField()

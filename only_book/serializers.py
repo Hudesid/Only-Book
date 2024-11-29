@@ -42,7 +42,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
     def get_subtotal(self, obj):
-        return Decimal(str(obj.book.price)) * obj.quantity
+        return Decimal(obj.book.price) * obj.quantity
 
     def validate_quantity(self, value):
         if value <= 0:
@@ -51,10 +51,18 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
+    subtotal = OrderItemSerializer(read_only=True, many=True)
+    total_price = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = models.Order
         fields = ('id', 'user', 'books', 'created_at', 'total_price')
+
+    def get_total_price(self):
+        total_price = 0
+        for price in self.subtotal.subtotal:
+            total_price += price
+        return total_price
 
     def validate_books(self, value):
         for order_item in value:
